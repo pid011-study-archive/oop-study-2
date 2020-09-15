@@ -28,10 +28,10 @@ public:
     {
         using std::abs;
 
-        int h = abs(p1.y) + abs(p2.y);
-        int w = abs(p1.x) + abs(p2.x);
+        int h = p2.y - p1.y;
+        int w = p2.x - p1.x;
 
-        return h * w;
+        return abs(h * w);
     }
 };
 
