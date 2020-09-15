@@ -63,7 +63,7 @@ void Car::show_status()
 
 int main()
 {
-    cout << "아이디를 입력해주세요.\n> ";
+    cout << "Enter your id.\n> ";
     string id;
     std::getline(cin, id);
 

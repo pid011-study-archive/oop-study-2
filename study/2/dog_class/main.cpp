@@ -16,12 +16,12 @@ public:
 
     void bark() const
     {
-        cout << "¸Û¸Û" << endl;
+        cout << "ë©ë©" << endl;
     }
 
     void use_tail() const
     {
-        cout << "²¿¸®¸¦ Ä¨´Ï´Ù." << endl;
+        cout << "ê¼¬ë¦¬ë¥¼ ì¹©ë‹ˆë‹¤." << endl;
     }
 
     void show_info() const
@@ -41,7 +41,7 @@ private:
 
 int main()
 {
-    Dog dog_info = Dog("ºÒµ¶", 2, 1.3f);
+    Dog dog_info = Dog("ë¶ˆë…", 2, 1.3f);
     dog_info.show_info();
     dog_info.bark();
     dog_info.use_tail();
