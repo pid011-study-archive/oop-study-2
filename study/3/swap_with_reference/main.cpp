@@ -1,14 +1,12 @@
-#include <iostream>
+﻿#include <iostream>
 
-void swap(int& a, int& b)
-{
+void swap(int& a, int& b) {
     int tmp = a;
-    a = b;
-    b = tmp;
+    a       = b;
+    b       = tmp;
 }
 
-int main()
-{
+int main() {
     using std::cout;
 
     int a = 10, b = 20;

@@ -1,21 +1,13 @@
-#include <iostream>
+﻿#include <iostream>
 
-class Example
-{
+class Example {
 public:
-    void Print()
-    {
-        std::cout << "Hello, World!" << std::endl;
-    }
+    void Print() { std::cout << "Hello, World!" << std::endl; }
 
-    void Print() const
-    {
-        std::cout << "Hello, World! (const)" << std::endl;
-    }
+    void Print() const { std::cout << "Hello, World! (const)" << std::endl; }
 };
 
-int main()
-{
+int main() {
     Example e1;
     const Example e2;
 
