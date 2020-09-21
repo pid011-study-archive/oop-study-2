@@ -1,4 +1,6 @@
-﻿# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+﻿# Gist: https://gist.github.com/pid011/9d445df38aa693ade24abe187d524a20
+# Reference: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+
 Language: Cpp
 BasedOnStyle: LLVM
 
@@ -17,7 +19,7 @@ AllowAllParametersOfDeclarationOnNextLine: true
 AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: false
 # AllowShortEnumsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: Inline
+AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: false
