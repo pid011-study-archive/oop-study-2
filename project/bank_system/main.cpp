@@ -1,30 +1,95 @@
 ﻿#include "account.hpp"
+#include <cstdio>
+#include <fstream>
 #include <iostream>
+#include <vector>
 
 using namespace BankSystem;
 using namespace std;
 
-void menu_create() {
+const char* FileName = "accounts.dat";
+
+void write_data(int len, Account** accounts) {
+    ofstream fs(FileName, ios::out);
+    fs << len << '\n';
+    for (size_t i = 0; i < len; i++) {
+        fs << accounts[i]->get_id() << '\n'
+           << accounts[i]->get_name() << '\n'
+           << accounts[i]->get_balance() << '\n';
+    }
+    fs.close();
+}
+
+int read_data(Account** accounts) {
+    int count = 0;
+
+    ifstream fs(FileName);
+    if (!fs) {
+        ofstream fout(FileName, ios::out);
+        fout.close();
+        fs.close();
+        return 0;
+    }
+    const int MAX = 100000;
+
+    char data_len[100];
+    fs.getline(data_len, MAX);
+    if (strlen(data_len) == 0) {
+        fs.close();
+        return 0;
+    }
+    count = atoi(data_len);
+
+    for (int i = 0; i < count; i++) {
+        char* data = new char[MAX];
+        fs.getline(data, MAX);
+        char* id = new char[strlen(data) + 1];
+        strcpy(id, data);
+
+        fs.getline(data, MAX);
+        char* name = new char[strlen(data) + 1];
+        strcpy(name, data);
+
+        fs.getline(data, MAX);
+        char* balance = new char[strlen(data) + 1];
+        strcpy(balance, data);
+
+        accounts[i] = new Account(atoi(id), name, atoi(balance));
+        delete[] data;
+        delete[] id;
+        delete[] name;
+        delete[] balance;
+    }
+
+    fs.close();
+    return count;
+}
+
+int menu_create(int len, Account** accounts) {
     cout << "[계좌개설]" << endl;
 
     char name[50];
     int account_number;
     int money;
 
-    cout << "계좌번호 : ";
-    cin >> account_number;
-    cin.ignore();
     cout << "이름 : ";
-    cin.getline(name, 50);
+    cin.getline(name, 200);
     cout << "입금액 : ";
     cin >> money;
-    cin.ignore();
+    cin.ignore(1000, '\n');
+    len += 1;
+    account_number = len;
 
-    Account acnt = Account(name, account_number, money);
+    accounts[len - 1] = new Account(account_number, name, money);
+
+    cout << "계좌번호 : " << account_number << endl;
     cout << "계좌개설완료" << endl;
+    accounts[len - 1]->show_info();
+
+    return len;
 }
 
-void menu_deposit() {
+void menu_deposit(int len, Account** accounts) {
     cout << "[입금]" << endl;
 
     int account_number;
@@ -32,27 +97,28 @@ void menu_deposit() {
 
     cout << "계좌번호 : ";
     cin >> account_number;
-    cin.ignore();
+    cin.ignore(1000, '\n');
+
+    int pos = -1;
+    for (int i = 0; i < len; i++) {
+        if (accounts[i]->get_id() == account_number) {
+            pos = i;
+            break;
+        }
+    }
+    if (pos == -1) {
+        cout << "일치하는 계좌가 없습니다." << endl;
+        return;
+    }
+
     cout << "입금액 : ";
     cin >> money;
-    cin.ignore();
-
-    Account acnt;
-    bool result = Account::load_account(&acnt, account_number);
-
-    if (!result) {
-        cout << "계좌번호가 다릅니다." << endl;
-    }
-
-    bool deposit_result = acnt.deposit(money);
-
-    if (!deposit_result) {
-        cout << "입금실패" << endl;
-    }
-    cout << "입금완료" << endl;
+    cin.ignore(1000, '\n');
+    accounts[pos]->deposit(money);
+    accounts[pos]->show_info();
 }
 
-void menu_withdraw() {
+void menu_withdraw(int len, Account** accounts) {
     cout << "[출금]" << endl;
 
     int account_number;
@@ -60,78 +126,80 @@ void menu_withdraw() {
 
     cout << "계좌번호 : ";
     cin >> account_number;
-    cin.ignore();
+    cin.ignore(1000, '\n');
+
+    int pos = -1;
+    for (int i = 0; i < len; i++) {
+        if (accounts[i]->get_id() == account_number) {
+            pos = i;
+            break;
+        }
+    }
+    if (pos == -1) {
+        cout << "일치하는 계좌가 없습니다." << endl;
+        return;
+    }
+
+    accounts[pos]->show_info();
     cout << "출금액 : ";
     cin >> money;
-    cin.ignore();
+    cin.ignore(1000, '\n');
 
-    Account acnt;
-    bool result = Account::load_account(&acnt, account_number);
-
-    if (!result) {
-        cout << "계좌번호가 다릅니다." << endl;
-    }
-
-    bool withdraw_result = acnt.deposit(money);
-
-    if (!withdraw_result) {
-        cout << "출금실패" << endl;
-    }
-    cout << "출금완료" << endl;
+    int result = accounts[pos]->withdraw(money);
+    cout << result << "원이 인출되었습니다." << endl;
+    accounts[pos]->show_info();
 }
 
-void menu_view() {
-    cout << "[잔액조회]" << endl;
-
-    int account_number;
-
-    cout << "계좌번호 : ";
-    cin >> account_number;
-    cin.ignore();
-
-    Account acnt;
-    bool result = Account::load_account(&acnt, account_number);
-
-    if (!result) {
-        cout << "계좌번호가 다릅니다." << endl;
+void menu_view(int len, Account** accounts) {
+    cout << "[전체 계좌 조회]" << endl;
+    if (len < 1) {
+        cout << "존재하는 계좌가 없습니다." << endl;
+        return;
     }
-
-    cout << "잔액 : " << acnt.get_money() << endl;
+    for (int i = 0; i < len; i++) {
+        accounts[i]->show_info();
+    }
 }
 
 int main() {
     int input = 0;
 
-    while (input != 5) {
-        cout << "--- Menu ---" << endl;
-        cout << "1. 계좌개설" << endl;
-        cout << "2. 입금" << endl;
-        cout << "3. 출금" << endl;
-        cout << "4. 잔액조회" << endl;
-        cout << "5. 프로그램 종료" << endl;
+    Account* acc_arr[100];
+    int accounts_len = read_data(acc_arr);
 
-        cout << "선택: ";
-        cin >> input;
-        cin.ignore();
+    cout << "--- Menu ---" << endl;
+    cout << "1. 계좌개설" << endl;
+    cout << "2. 입금" << endl;
+    cout << "3. 출금" << endl;
+    cout << "4. 잔액조회" << endl;
+    cout << "5. 프로그램 종료" << endl;
 
-        switch (input) {
-        case 1:
-            menu_create();
-            break;
-        case 2:
-            menu_deposit();
-            break;
-        case 3:
-            menu_withdraw();
-            break;
-        case 4:
-            menu_view();
-            break;
-        case 5:
-            break;
-        default:
-            cout << "다시 선택해주세요." << endl;
-            break;
-        }
+    cout << "선택: ";
+    cin >> input;
+    cin.ignore();
+
+    switch (input) {
+    case 1:
+        accounts_len = menu_create(accounts_len, acc_arr);
+        break;
+    case 2:
+        menu_deposit(accounts_len, acc_arr);
+        break;
+    case 3:
+        menu_withdraw(accounts_len, acc_arr);
+        break;
+    case 4:
+        menu_view(accounts_len, acc_arr);
+        break;
+    case 5:
+        break;
+    default:
+        break;
+    }
+
+    write_data(accounts_len, acc_arr);
+
+    for (size_t i = 0; i < accounts_len; i++) {
+        delete acc_arr[i];
     }
 }

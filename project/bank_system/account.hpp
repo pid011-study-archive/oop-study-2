@@ -1,83 +1,123 @@
 ﻿#pragma once
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <cstdio>
 #include <cstring>
 #include <fstream>
+#include <iostream>
 
+namespace BankSystem {
+    class Account {
+    public:
+        Account()
+            : _id(-1), _balance(0) {
+            _name = new char[2];
+            _name = "-";
+        }
+        Account(int id, const char* name, int money)
+            : _id(id), _balance(money) {
+            _name = new char[strlen(name) + 1];
+            strcpy(_name, name);
+        }
+
+        Account(const Account& copy)
+            : _id(copy._id), _balance(copy._balance) {
+            _name = new char[strlen(copy._name) + 1];
+            strcpy(_name, copy._name);
+        }
+
+        ~Account() {
+            delete[] _name;
+        }
+
+        int& get_id() {
+            return _id;
+        }
+
+        char*& get_name() {
+            return _name;
+        }
+
+        int& get_balance() {
+            return _balance;
+        }
+
+        // 입금
+        void deposit(int money) {
+            if (money <= 0) {
+                return;
+            }
+
+            _balance += money;
+        }
+
+        // 출금
+        int withdraw(int money) {
+            if (_balance < money) {
+                return 0;
+            }
+
+            _balance -= money;
+            return money;
+        }
+
+        void show_info() const {
+            using std::cout;
+            using std::endl;
+
+            cout << "---------------------------" << endl;
+            cout << "계좌번호 : " << _id << endl;
+            cout << "이름 : " << _name << endl;
+            cout << "현재 잔액 : " << _balance << endl;
+            cout << "---------------------------" << endl;
+        }
+
+    private:
+        int _id;
+        char* _name;
+        int _balance;
+    };
+}
+
+/*
 namespace BankSystem {
     class Account {
     private:
         static const char* _file_extension;
 
         char* _name;
-        char* _file_name;
         int _account_number = 0;
         int _money = 0;
 
     public:
         Account() {
-            _name = new char[30];
-            _file_name = new char[50];
+            _name = new char[2];
+            _name = "";
         }
 
         Account(const char* name, int account_number, int money) {
-            _name = new char[30];
-            _file_name = new char[50];
-
-            // 이름 동적할당
-            strcpy_s(_name, 30, name);
-
-            // 저장할 파일의 이름 [계좌번호.dat]
-            sprintf_s(_name, 30, "%d", account_number);
-            strcpy_s(_file_name, 50, _name);
-            strcat_s(_file_name, 50, _file_extension);
-
+            _name = new char[strlen(name)];
+            strcpy(_name, name);
             _account_number = account_number;
             _money = money;
+        }
 
-            save();
+        Account(const Account& copy) {
+            if (copy._name != nullptr) {
+                _name = new char[strlen(copy._name)];
+                strcpy(_name, copy._name);
+            } else {
+                _name = new char[2];
+                _name = "";
+            }
+            _account_number = copy._account_number;
+            _money = copy._money;
         }
 
         ~Account() {
-            // 동적할당한 메모리를 해제해줘야 하는데 오류 발생함
-            if (_name) {
+            if (_name != nullptr) {
                 delete[] _name;
             }
-
-            if (_file_name) {
-                delete[] _file_name;
-            }
-        }
-
-        static bool load_account(Account* load_data, int account_number) {
-            using namespace std;
-
-            Account account;
-
-            char tmp[50];
-            sprintf_s(tmp, 50, "%d", account_number);
-
-            size_t ext_length = strlen(_file_extension);
-            size_t file_name_length = strlen(tmp) + ext_length + 1;
-            char* file_name = new char[file_name_length];
-
-            strcpy_s(file_name, file_name_length, tmp);
-            strcat_s(file_name, file_name_length, _file_extension);
-
-            ifstream fs(file_name, ios::in | ios::binary);
-            if (!fs) {
-                return false;
-            }
-
-            fs.read((char*)load_data, sizeof(Account));
-            fs.close();
-            delete[] file_name;
-
-            return true;
-        }
-
-        static const char* get_file_extension() {
-            return _file_extension;
         }
 
         const char* get_name() const {
@@ -92,16 +132,6 @@ namespace BankSystem {
             return &_money;
         }
 
-        // 현재 인스턴스를 파일에 저장
-        bool save() {
-            using namespace std;
-
-            ofstream fs(_file_name, ios::out | ios::binary);
-            fs.write((char*)this, sizeof(Account));
-            fs.close();
-            return true;
-        }
-
         // 입금
         bool deposit(int money) {
             if (money <= 0) {
@@ -109,7 +139,7 @@ namespace BankSystem {
             }
 
             _money += money;
-            return save();
+            return true;
         }
 
         // 출금
@@ -119,9 +149,8 @@ namespace BankSystem {
             }
 
             _money -= money;
-            return save();
+            return true;
         }
     };
-
-    const char* Account::_file_extension = ".dat";
 }
+*/
