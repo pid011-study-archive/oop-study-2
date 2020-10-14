@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 
 using namespace std;
 
@@ -7,8 +7,7 @@ private:
     int _bullet;
 
 public:
-    Gun(int bnum)
-        : _bullet(bnum) { }
+    Gun(int bnum) : _bullet(bnum) { }
     void shot() {
         if (_bullet <= 0) {
             cout << "총알이 없음" << endl;
@@ -37,8 +36,7 @@ private:
     }
 
 public:
-    Police(int bnum, int bcuff)
-        : _handcuffs(bcuff) {
+    Police(int bnum, int bcuff) : _handcuffs(bcuff) {
         if (bnum > 0) {
             _gun = new Gun(bnum);
         }
