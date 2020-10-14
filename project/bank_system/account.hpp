@@ -12,18 +12,20 @@ namespace BankSystem {
         Account()
             : _id(-1), _balance(0) {
             _name = new char[2];
-            _name = "-";
+            // _name = "-";
         }
         Account(int id, const char* name, int money)
             : _id(id), _balance(money) {
             _name = new char[strlen(name) + 1];
-            strcpy(_name, name);
+            // strcpy(_name, name);
+            strncpy(_name, name, strlen(name) + 1);
         }
 
         Account(const Account& copy)
             : _id(copy._id), _balance(copy._balance) {
             _name = new char[strlen(copy._name) + 1];
-            strcpy(_name, copy._name);
+            // strcpy(_name, copy._name);
+            strncpy(_name, copy._name, strlen(copy._name) + 1);
         }
 
         ~Account() {

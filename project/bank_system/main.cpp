@@ -1,5 +1,6 @@
 ﻿#include "account.hpp"
 #include <cstdio>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -44,15 +45,18 @@ int read_data(Account** accounts) {
         char* data = new char[MAX];
         fs.getline(data, MAX);
         char* id = new char[strlen(data) + 1];
-        strcpy(id, data);
+        // strcpy(id, data);
+        strncpy(id, data, strlen(data) + 1);
 
         fs.getline(data, MAX);
         char* name = new char[strlen(data) + 1];
-        strcpy(name, data);
+        // strcpy(name, data);
+        strncpy(name, data, strlen(data) + 1);
 
         fs.getline(data, MAX);
         char* balance = new char[strlen(data) + 1];
-        strcpy(balance, data);
+        // strcpy(balance, data);
+        strncpy(balance, data, strlen(data) + 1);
 
         accounts[i] = new Account(atoi(id), name, atoi(balance));
         delete[] data;
@@ -165,6 +169,10 @@ int main() {
     int input = 0;
 
     Account* acc_arr[100];
+    for (int i = 0; i < 100; i++) {
+        acc_arr[i] = nullptr;
+    }
+
     int accounts_len = read_data(acc_arr);
 
     cout << "--- Menu ---" << endl;
@@ -199,7 +207,9 @@ int main() {
 
     write_data(accounts_len, acc_arr);
 
-    for (size_t i = 0; i < accounts_len; i++) {
-        delete acc_arr[i];
+    for (int i = 0; i < 100; i++) {
+        if (acc_arr[i]) {
+            delete acc_arr[i];
+        }
     }
 }
