@@ -1,4 +1,4 @@
-﻿#include "account.hpp"
+﻿#include "account.h"
 #include <cstdio>
 #include <cstring>
 #include <fstream>
@@ -14,9 +14,9 @@ void write_data(int len, Account** accounts) {
     ofstream fs(FileName, ios::out);
     fs << len << '\n';
     for (size_t i = 0; i < len; i++) {
-        fs << accounts[i]->get_id() << '\n'
-           << accounts[i]->get_name() << '\n'
-           << accounts[i]->get_balance() << '\n';
+        fs << accounts[i]->get_id() << '\n';
+        fs << accounts[i]->get_name() << '\n';
+        fs << accounts[i]->get_balance() << '\n';
     }
     fs.close();
 }

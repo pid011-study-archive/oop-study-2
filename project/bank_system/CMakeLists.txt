@@ -4,4 +4,4 @@ set (PROJECT_NAME "bank_system")
 set (CMAKE_CXX_STANDARD 11)
 
 project (${PROJECT_NAME})
-add_executable(${PROJECT_NAME} main.cpp account.hpp)
+add_executable(${PROJECT_NAME} main.cpp)
