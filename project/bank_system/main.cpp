@@ -1,14 +1,72 @@
 ﻿#include "account.h"
-#include <cstdio>
+#include "high_credit_account.h"
+#include "normal_account.h"
+#include <algorithm>
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <iostream>
-#include <vector>
 
 using namespace BankSystem;
 using namespace std;
 
 const char* FileName = "accounts.dat";
+
+void write_data(int len, Account** accounts);
+int read_data(Account** accounts);
+int menu_create(int len, Account** accounts);
+int menu_create_normal_account(int len, Account** accounts);
+int menu_create_high_credit_account(int len, Account** accounts);
+void menu_deposit(int len, Account** accounts);
+void menu_withdraw(int len, Account** accounts);
+void menu_view(int len, Account** accounts);
+
+int main() {
+    while (true) {
+        int input = 0;
+
+        Account* acc_arr[100];
+        std::fill(acc_arr, acc_arr + 100, nullptr);
+
+        int accounts_len = read_data(acc_arr);
+
+        cout << "--- Menu ---" << endl;
+        cout << "1. 계좌개설" << endl;
+        cout << "2. 입금" << endl;
+        cout << "3. 출금" << endl;
+        cout << "4. 잔액조회" << endl;
+        cout << "5. 프로그램 종료" << endl;
+
+        cout << "선택: ";
+        cin >> input;
+        cin.ignore();
+
+        switch (input) {
+        case 1:
+            accounts_len = menu_create(accounts_len, acc_arr);
+            break;
+        case 2:
+            menu_deposit(accounts_len, acc_arr);
+            break;
+        case 3:
+            menu_withdraw(accounts_len, acc_arr);
+            break;
+        case 4:
+            menu_view(accounts_len, acc_arr);
+            break;
+        case 5:
+            return 0;
+        default:
+            break;
+        }
+
+        write_data(accounts_len, acc_arr);
+
+        for (auto& i : acc_arr) {
+            delete i;
+        }
+    }
+}
 
 void write_data(int len, Account** accounts) {
     ofstream fs(FileName, ios::out);
@@ -17,12 +75,13 @@ void write_data(int len, Account** accounts) {
         fs << accounts[i]->get_id() << '\n';
         fs << accounts[i]->get_name() << '\n';
         fs << accounts[i]->get_balance() << '\n';
+        fs << accounts[i]->get_interest_rate() << '\n';
     }
     fs.close();
 }
 
 int read_data(Account** accounts) {
-    int count = 0;
+    int count;
 
     ifstream fs(FileName);
     if (!fs) {
@@ -31,15 +90,17 @@ int read_data(Account** accounts) {
         fs.close();
         return 0;
     }
-    const int MAX = 100000;
 
+    constexpr int MAX = 100;
     char data_len[100];
     fs.getline(data_len, MAX);
     if (strlen(data_len) == 0) {
         fs.close();
         return 0;
     }
-    count = atoi(data_len);
+
+    char* end_ptr;
+    count = int(strtol(data_len, &end_ptr, 10));
 
     for (int i = 0; i < count; i++) {
         char* data = new char[MAX];
@@ -58,11 +119,21 @@ int read_data(Account** accounts) {
         // strcpy(balance, data);
         strncpy(balance, data, strlen(data) + 1);
 
-        accounts[i] = new Account(atoi(id), name, atoi(balance));
+        fs.getline(data, MAX);
+        char* rate_interest = new char[strlen(data) + 1];
+        strncpy(rate_interest, data, strlen(data) + 1);
+
+        accounts[i] = new Account(
+            int(strtol(id, &end_ptr, 10)),
+            name,
+            int(strtol(balance, &end_ptr, 10)),
+            int(strtol(rate_interest, &end_ptr, 10)));
+
         delete[] data;
         delete[] id;
         delete[] name;
         delete[] balance;
+        delete[] rate_interest;
     }
 
     fs.close();
@@ -72,10 +143,29 @@ int read_data(Account** accounts) {
 int menu_create(int len, Account** accounts) {
     cout << "[계좌개설]" << endl;
 
+    while (true) {
+        cout << "1. 보통예금계좌 2. 신용계좌 [선택]: ";
+
+        int choose;
+        cin >> choose;
+
+        switch (choose) {
+        case 1:
+            return menu_create_normal_account(len, accounts);
+        case 2:
+            return menu_create_high_credit_account(len, accounts);
+        default:
+            break;
+        }
+    }
+}
+
+int menu_create_normal_account(int len, Account** accounts) {
     char name[50];
     int account_number;
     int money;
-
+    cin.ignore(1000, '\n');
+    cout << "[보통예금계좌]" << endl;
     cout << "이름 : ";
     cin.getline(name, 200);
     cout << "입금액 : ";
@@ -84,7 +174,33 @@ int menu_create(int len, Account** accounts) {
     len += 1;
     account_number = len;
 
-    accounts[len - 1] = new Account(account_number, name, money);
+    accounts[len - 1] = new NormalAccount(account_number, name, money);
+
+    cout << "계좌번호 : " << account_number << endl;
+    cout << "계좌개설완료" << endl;
+    accounts[len - 1]->show_info();
+
+    return len;
+}
+
+int menu_create_high_credit_account(int len, Account** accounts) {
+    char name[50];
+    int account_number;
+    int money;
+    char credit;
+    cin.ignore(1000, '\n');
+    cout << "[신용예금계좌]" << endl;
+    cout << "이름 : ";
+    cin.getline(name, 200);
+    cout << "입금액 : ";
+    cin >> money;
+    len += 1;
+    account_number = len;
+    cout << "신용등급(A, B, C): ";
+    cin >> credit;
+    cin.ignore(1000, '\n');
+
+    accounts[len - 1] = new HighCreditAccount(account_number, name, money, credit);
 
     cout << "계좌번호 : " << account_number << endl;
     cout << "계좌개설완료" << endl;
@@ -119,6 +235,7 @@ void menu_deposit(int len, Account** accounts) {
     cin >> money;
     cin.ignore(1000, '\n');
     accounts[pos]->deposit(money);
+    cout << "입금되었습니다." << endl;
     accounts[pos]->show_info();
 }
 
@@ -162,54 +279,5 @@ void menu_view(int len, Account** accounts) {
     }
     for (int i = 0; i < len; i++) {
         accounts[i]->show_info();
-    }
-}
-
-int main() {
-    int input = 0;
-
-    Account* acc_arr[100];
-    for (int i = 0; i < 100; i++) {
-        acc_arr[i] = nullptr;
-    }
-
-    int accounts_len = read_data(acc_arr);
-
-    cout << "--- Menu ---" << endl;
-    cout << "1. 계좌개설" << endl;
-    cout << "2. 입금" << endl;
-    cout << "3. 출금" << endl;
-    cout << "4. 잔액조회" << endl;
-    cout << "5. 프로그램 종료" << endl;
-
-    cout << "선택: ";
-    cin >> input;
-    cin.ignore();
-
-    switch (input) {
-    case 1:
-        accounts_len = menu_create(accounts_len, acc_arr);
-        break;
-    case 2:
-        menu_deposit(accounts_len, acc_arr);
-        break;
-    case 3:
-        menu_withdraw(accounts_len, acc_arr);
-        break;
-    case 4:
-        menu_view(accounts_len, acc_arr);
-        break;
-    case 5:
-        break;
-    default:
-        break;
-    }
-
-    write_data(accounts_len, acc_arr);
-
-    for (int i = 0; i < 100; i++) {
-        if (acc_arr[i]) {
-            delete acc_arr[i];
-        }
     }
 }
