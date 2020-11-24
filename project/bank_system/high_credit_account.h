@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "account.h"
 
@@ -23,4 +23,4 @@ namespace BankSystem {
             }
         }
     };
-}
+} // namespace BankSystem

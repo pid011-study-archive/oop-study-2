@@ -1,11 +1,12 @@
-﻿#include "account.h"
-#include "high_credit_account.h"
-#include "normal_account.h"
-#include <algorithm>
+﻿#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <iostream>
+
+#include "account.h"
+#include "high_credit_account.h"
+#include "normal_account.h"
 
 using namespace BankSystem;
 using namespace std;
@@ -62,7 +63,7 @@ int main() {
 
         write_data(accounts_len, acc_arr);
 
-        for (auto& i : acc_arr) {
+        for (auto& i: acc_arr) {
             delete i;
         }
     }

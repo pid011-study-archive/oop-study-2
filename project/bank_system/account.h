@@ -8,7 +8,6 @@ namespace BankSystem {
         int _interest_rate;
 
     public:
-
         Account() : _id(-1), _balance(0), _name(nullptr), _interest_rate(0) { }
         Account(int id, const char* name, int money, int interest_rate = 3);
         Account(const Account& other);
@@ -43,4 +42,4 @@ namespace BankSystem {
     protected:
         void set_interest_rate(int value);
     };
-}
+} // namespace BankSystem
